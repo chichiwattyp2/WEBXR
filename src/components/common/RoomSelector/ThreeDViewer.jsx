@@ -124,6 +124,14 @@ const rooms = [
 export default function RoomSelector() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const router = useRouter();
+    useEffect(() => {
+    if (typeof window !== 'undefined' && !document.querySelector('script[src*="aframe"]')) {
+      const script = document.createElement('script');
+      script.src = 'https://aframe.io/releases/1.4.2/aframe.min.js';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+  }, []);
 
   useEffect(() => {
     if (!document.querySelector('script[src*="model-viewer"]')) {

@@ -1,4 +1,3 @@
-
 "use client";
 import useGetProducts from "@/hooks/useGetProducts";
 import * as THREE from "three";
@@ -51,8 +50,16 @@ export default function Page() {
   const { mutate: uploadModel } = useUploadModel();     // دي خاصة برفع الموديل
   const [arFileUrl, setArFileUrl] = useState(null);
   const { mutate: mutateGetArFile } = useGetArFile();
-  const [floorColor, setFloorColor] = useState("#ccc");
-  const [wallColor, setWallColor] = useState("#4CAF50");
+  const [floorColor, setFloorColor] = useState("#9b7c55");
+  const [wallColor, setWallColor] = useState("#b13535");
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !document.querySelector('script[src*="aframe"]')) {
+      const script = document.createElement('script');
+      script.src = 'https://aframe.io/releases/1.4.2/aframe.min.js';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+  }, []);
   useEffect(() => {
     const savedFloor = localStorage.getItem("floorColor");
     const savedWall = localStorage.getItem("wallColor");
@@ -84,13 +91,13 @@ export default function Page() {
   //   }
   // }, []);
   useEffect(() => {
-  if (typeof window !== 'undefined' && !document.querySelector('script[src*="aframe"]')) {
-    const script = document.createElement('script');
-    script.src = 'https://aframe.io/releases/1.4.2/aframe.min.js';
-    script.async = true;
-    document.head.appendChild(script);
-  }
-}, []);
+    if (typeof window !== 'undefined' && !document.querySelector('script[src*="aframe"]')) {
+      const script = document.createElement('script');
+      script.src = 'https://aframe.io/releases/1.4.2/aframe.min.js';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.AFRAME &&
@@ -840,159 +847,158 @@ export default function Page() {
   //     );
   //   };
   // 🔧 الدالة المحسنة لحفظ الصور - تدعم الموبايل والكمبيوتر
-const handleSaveScreenshot = async () => {
-  try {
-    const sceneEl = document.querySelector("a-scene");
-    if (!sceneEl) {
-      console.error("❌ No scene found.");
-      toast.error("لم يتم العثور على المشهد");
-      return;
-    }
-
-    // انتظار تحميل المشهد
-    if (!sceneEl.hasLoaded) {
-      console.log("⏳ Waiting for scene to load...");
-      await new Promise((resolve) => {
-        sceneEl.addEventListener('loaded', resolve, { once: true });
-      });
-    }
-
-    // محاولة الحصول على الكانفاس بطرق مختلفة
-    let canvas = null;
-    let retryCount = 0;
-    const maxRetries = 10;
-
-    while (!canvas && retryCount < maxRetries) {
-      // طرق مختلفة للحصول على الكانفاس
-      canvas = sceneEl.canvas || 
-               sceneEl.renderer?.domElement || 
-               document.querySelector("canvas.a-canvas") ||
-               document.querySelector("canvas[data-aframe-canvas]") ||
-               document.querySelector("canvas");
-
-      if (!canvas) {
-        console.log(`🔄 Retry ${retryCount + 1}/${maxRetries} - Canvas not found`);
-        await new Promise(resolve => setTimeout(resolve, 200));
-        retryCount++;
-      }
-    }
-
-    if (!canvas) {
-      console.error("❌ Canvas not found after retries");
-      toast.error("تعذر العثور على لوحة الرسم");
-      return;
-    }
-
-    // التحقق من إمكانية استخدام toDataURL
-    if (typeof canvas.toDataURL !== "function") {
-      console.error("❌ Canvas does not support toDataURL");
-      toast.error("المتصفح لا يدعم حفظ الصور");
-      return;
-    }
-
-    // للموبايل: إجبار إعادة الرسم
-    if (isMobile && sceneEl.renderer) {
-      sceneEl.renderer.render(sceneEl.object3D, sceneEl.camera);
-    }
-
-    // محاولة الحصول على الصورة
-    let base64Image;
+  const handleSaveScreenshot = async () => {
     try {
-      base64Image = canvas.toDataURL("image/png", 1.0);
-    } catch (error) {
-      // إذا فشل PNG، جرب JPEG
-      try {
-        base64Image = canvas.toDataURL("image/jpeg", 0.9);
-      } catch (jpegError) {
-        console.error("❌ Failed to capture image:", jpegError);
-        toast.error("فشل في التقاط الصورة");
+      const sceneEl = document.querySelector("a-scene");
+      if (!sceneEl) {
+        console.error("❌ No scene found.");
+        toast.error("لم يتم العثور على المشهد");
         return;
       }
-    }
 
-    // التحقق من صحة البيانات
-    if (!base64Image || !base64Image.startsWith("data:image")) {
-      console.error("❌ Invalid image data");
-      toast.error("بيانات الصورة غير صالحة");
-      return;
-    }
-
-    // رفع الصورة
-    SaveProjects(
-      {
-        image: base64Image,
-        userEmail: "lzayd927@gmail.com",
-      },
-      {
-        onSuccess: () => {
-          console.log("✅ Screenshot saved successfully");
-          toast.success("تم حفظ الصورة بنجاح");
-          router.push("/projects");
-        },
-        onError: (err) => {
-          console.error("❌ Upload error:", err);
-          toast.error("فشل في رفع الصورة");
-        },
+      // انتظار تحميل المشهد
+      if (!sceneEl.hasLoaded) {
+        console.log("⏳ Waiting for scene to load...");
+        await new Promise((resolve) => {
+          sceneEl.addEventListener('loaded', resolve, { once: true });
+        });
       }
-    );
 
-  } catch (error) {
-    console.error("❌ Unexpected error:", error);
-    toast.error("حدث خطأ غير متوقع");
-  }
-};
+      // محاولة الحصول على الكانفاس بطرق مختلفة
+      let canvas = null;
+      let retryCount = 0;
+      const maxRetries = 10;
 
-// 🔧 إضافة دالة للتحقق من جاهزية الكانفاس
-const checkCanvasReady = () => {
-  const sceneEl = document.querySelector("a-scene");
-  if (!sceneEl) return false;
-  
-  const canvas = sceneEl.canvas || 
-                sceneEl.renderer?.domElement || 
-                document.querySelector("canvas.a-canvas");
-  
-  return canvas && typeof canvas.toDataURL === "function";
-};
+      while (!canvas && retryCount < maxRetries) {
+        // طرق مختلفة للحصول على الكانفاس
+        canvas = sceneEl.canvas ||
+          sceneEl.renderer?.domElement ||
+          document.querySelector("canvas.a-canvas") ||
+          document.querySelector("canvas[data-aframe-canvas]") ||
+          document.querySelector("canvas");
 
-// 🔧 إضافة دالة لإجبار إعادة الرسم (للموبايل)
-const forceRender = () => {
-  const sceneEl = document.querySelector("a-scene");
-  if (sceneEl && sceneEl.renderer && sceneEl.camera) {
-    sceneEl.renderer.render(sceneEl.object3D, sceneEl.camera);
-  }
-};
+        if (!canvas) {
+          console.log(`🔄 Retry ${retryCount + 1}/${maxRetries} - Canvas not found`);
+          await new Promise(resolve => setTimeout(resolve, 200));
+          retryCount++;
+        }
+      }
 
-// 🔧 تحسين زر الحفظ
-const SaveButton = () => {
-  const [isReady, setIsReady] = useState(false);
-  
-  useEffect(() => {
-    const checkReady = () => {
-      setIsReady(checkCanvasReady());
-    };
-    
-    // فحص دوري للتأكد من جاهزية الكانفاس
-    const interval = setInterval(checkReady, 1000);
-    checkReady(); // فحص فوري
-    
-    return () => clearInterval(interval);
-  }, []);
+      if (!canvas) {
+        console.error("❌ Canvas not found after retries");
+        toast.error("تعذر العثور على لوحة الرسم");
+        return;
+      }
 
-  return (
-    <button
-      onClick={handleSaveScreenshot}
-      disabled={!isReady}
-      className={`w-10 h-10 flex items-center justify-center text-lg rounded-full shadow transition-all duration-300 ${
-        isReady 
+      // التحقق من إمكانية استخدام toDataURL
+      if (typeof canvas.toDataURL !== "function") {
+        console.error("❌ Canvas does not support toDataURL");
+        toast.error("المتصفح لا يدعم حفظ الصور");
+        return;
+      }
+
+      // للموبايل: إجبار إعادة الرسم
+      if (isMobile && sceneEl.renderer) {
+        sceneEl.renderer.render(sceneEl.object3D, sceneEl.camera);
+      }
+
+      // محاولة الحصول على الصورة
+      let base64Image;
+      try {
+        base64Image = canvas.toDataURL("image/png", 1.0);
+      } catch (error) {
+        // إذا فشل PNG، جرب JPEG
+        try {
+          base64Image = canvas.toDataURL("image/jpeg", 0.9);
+        } catch (jpegError) {
+          console.error("❌ Failed to capture image:", jpegError);
+          toast.error("فشل في التقاط الصورة");
+          return;
+        }
+      }
+
+      // التحقق من صحة البيانات
+      if (!base64Image || !base64Image.startsWith("data:image")) {
+        console.error("❌ Invalid image data");
+        toast.error("بيانات الصورة غير صالحة");
+        return;
+      }
+
+      // رفع الصورة
+      SaveProjects(
+        {
+          image: base64Image,
+          userEmail: "lzayd927@gmail.com",
+        },
+        {
+          onSuccess: () => {
+            console.log("✅ Screenshot saved successfully");
+            toast.success("تم حفظ الصورة بنجاح");
+            router.push("/projects");
+          },
+          onError: (err) => {
+            console.error("❌ Upload error:", err);
+            toast.error("فشل في رفع الصورة");
+          },
+        }
+      );
+
+    } catch (error) {
+      console.error("❌ Unexpected error:", error);
+      toast.error("حدث خطأ غير متوقع");
+    }
+  };
+
+  // 🔧 إضافة دالة للتحقق من جاهزية الكانفاس
+  const checkCanvasReady = () => {
+    const sceneEl = document.querySelector("a-scene");
+    if (!sceneEl) return false;
+
+    const canvas = sceneEl.canvas ||
+      sceneEl.renderer?.domElement ||
+      document.querySelector("canvas.a-canvas");
+
+    return canvas && typeof canvas.toDataURL === "function";
+  };
+
+  // 🔧 إضافة دالة لإجبار إعادة الرسم (للموبايل)
+  const forceRender = () => {
+    const sceneEl = document.querySelector("a-scene");
+    if (sceneEl && sceneEl.renderer && sceneEl.camera) {
+      sceneEl.renderer.render(sceneEl.object3D, sceneEl.camera);
+    }
+  };
+
+  // 🔧 تحسين زر الحفظ
+  const SaveButton = () => {
+    const [isReady, setIsReady] = useState(false);
+
+    useEffect(() => {
+      const checkReady = () => {
+        setIsReady(checkCanvasReady());
+      };
+
+      // فحص دوري للتأكد من جاهزية الكانفاس
+      const interval = setInterval(checkReady, 1000);
+      checkReady(); // فحص فوري
+
+      return () => clearInterval(interval);
+    }, []);
+
+    return (
+      <button
+        onClick={handleSaveScreenshot}
+        disabled={!isReady}
+        className={`w-10 h-10 flex items-center justify-center text-lg rounded-full shadow transition-all duration-300 ${isReady
           ? 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 cursor-pointer'
           : 'bg-gray-300 text-gray-500 border border-gray-400 cursor-not-allowed'
-      }`}
-      title={isReady ? "Save Screenshot" : "Please wait..."}
-    >
-      💾
-    </button>
-  );
-};
+          }`}
+        title={isReady ? "Save Screenshot" : "Please wait..."}
+      >
+        💾
+      </button>
+    );
+  };
 
   return (
     <ResponsiveARView
@@ -1070,56 +1076,56 @@ const SaveButton = () => {
 
       measurementButton={
         <>
-         <div className="flex flex-col md:flex-row items-start md:items-center gap-4 bg-white rounded-2xl shadow-lg p-4 w-fit mb-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4 bg-white rounded-2xl shadow-lg p-4 w-fit mb-6">
 
-  {/* ✅ Color Pickers فقط لو في Custom Room */}
-  {useCustomRoom && (
-    <div className="flex flex-col sm:flex-row gap-4">
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold text-gray-700">Floor:</span>
-        <input
-          type="color"
-          value={floorColor}
-          onChange={(e) => handleColorChange("floor", e.target.value)}
-          className="w-10 h-10 rounded-md border border-gray-300 shadow-sm cursor-pointer"
-        />
-      </div>
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold text-gray-700">Wall:</span>
-        <input
-          type="color"
-          value={wallColor}
-          onChange={(e) => handleColorChange("wall", e.target.value)}
-          className="w-10 h-10 rounded-md border border-gray-300 shadow-sm cursor-pointer"
-        />
-      </div>
-    </div>
-  )}
+            {/* ✅ Color Pickers فقط لو في Custom Room */}
+            {useCustomRoom && (
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-gray-700">Floor:</span>
+                  <input
+                    type="color"
+                    value={floorColor}
+                    onChange={(e) => handleColorChange("floor", e.target.value)}
+                    className="w-10 h-10 rounded-md border border-gray-300 shadow-sm cursor-pointer"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-gray-700">Wall:</span>
+                  <input
+                    type="color"
+                    value={wallColor}
+                    onChange={(e) => handleColorChange("wall", e.target.value)}
+                    className="w-10 h-10 rounded-md border border-gray-300 shadow-sm cursor-pointer"
+                  />
+                </div>
+              </div>
+            )}
 
-  {/* 🛠️ Action Buttons */}
-  <div className="flex items-center gap-3 mt-3 md:mt-0">
-    <button
-      onClick={() => setShowMeasurementTool(!showMeasurementTool)}
-      className={`w-10 h-10 flex items-center justify-center text-lg rounded-full transition-colors duration-300 border shadow 
+            {/* 🛠️ Action Buttons */}
+            <div className="flex items-center gap-3 mt-3 md:mt-0">
+              <button
+                onClick={() => setShowMeasurementTool(!showMeasurementTool)}
+                className={`w-10 h-10 flex items-center justify-center text-lg rounded-full transition-colors duration-300 border shadow 
         ${showMeasurementTool
-          ? 'bg-mainbackground text-white border-mainbackground'
-          : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
-        }`}
-      title="Toggle Measurement Tool"
-    >
-      📏
-    </button>
+                    ? 'bg-mainbackground text-white border-mainbackground'
+                    : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
+                  }`}
+                title="Toggle Measurement Tool"
+              >
+                📏
+              </button>
 
-    <button
-      onClick={handleSaveScreenshot}
-      className="w-10 h-10 flex items-center justify-center text-lg rounded-full bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 shadow"
-      title="Save Screenshot"
-    >
-      💾
-    </button>
-  </div>
+              <button
+                onClick={handleSaveScreenshot}
+                className="w-10 h-10 flex items-center justify-center text-lg rounded-full bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 shadow"
+                title="Save Screenshot"
+              >
+                💾
+              </button>
+            </div>
 
-</div>
+          </div>
 
         </>
       }
@@ -1215,12 +1221,20 @@ const SaveButton = () => {
       {useCustomRoom ? (
         <a-scene embedded physics="debug: false" className="w-full h-full rounded-lg shadow-lg">
           {/* 🟡 إضاءة ناعمة وواقعية */}
+
           <a-entity light="type: ambient; color: #ffffff; intensity: 0.9"></a-entity>
+
+          <a-entity
+            light="type: point; intensity: 0.4; distance: 8"
+            position="0 2 -1"
+          ></a-entity>
           <a-entity
             light="type: directional; color: #ffffff; intensity: 0.6"
             position="6 10 6"
             shadow="cast: true"
           ></a-entity>
+
+
 
           {/* 🟩 أرضية كبيرة واقعية */}
           <a-plane
@@ -1234,11 +1248,37 @@ const SaveButton = () => {
             class="clickable-floor"
           ></a-plane>
 
-          {/* 🧱 جدران 12×12 × 3.2 ارتفاع */}
+          {/* 🧱 جدران 12×12 × 3.2 ارتفاع*/}
           <a-box position="-6 1.6 0" depth="12" height="3.2" width="0.1" color={wallColor || "#eeeeee"}></a-box>
+          {/* 🪟 شباك في الحيطة اليسار */}
+
           <a-box position="6 1.6 0" depth="12" height="3.2" width="0.1" color={wallColor || "#eeeeee"}></a-box>
+
+
           <a-box position="0 1.6 -6" width="12" height="3.2" depth="0.1" color={wallColor || "#eeeeee"}></a-box>
           <a-box position="0 1.6 6" width="12" height="3.2" depth="0.1" color={wallColor || "#eeeeee"}></a-box>
+          <a-entity
+            gltf-model="/window.glb"
+            position="5.95 1 0"
+            rotation="0 0 0"
+            scale="0.001 0.02 0.02"
+          />
+
+
+          <a-entity
+            gltf-model="/window3.glb"
+            position="-4.8 1 0"
+            rotation="0 0 0"
+            scale="0.2 0.2 0.5"
+          />
+          <a-entity
+            gltf-model="/door2.glb"
+            position="1 0 -5.9"
+            rotation="0 0 0"
+            scale="0.01 0.01 0.01"
+          />
+
+
 
           {/* 🌫️ سقف */}
           <a-box position="0 3.2 0" width="12" depth="12" height="0.1" color="#f5f5f5"></a-box>
@@ -1281,6 +1321,7 @@ const SaveButton = () => {
             </a-camera>
           </a-entity>
         </a-scene>
+
 
 
 
