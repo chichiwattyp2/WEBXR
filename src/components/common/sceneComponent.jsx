@@ -83,14 +83,14 @@ export default function Page() {
   //     import('aframe').catch(console.error);
   //   }
   // }, []);
-//   useEffect(() => {
-//   if (typeof window !== 'undefined' && !document.querySelector('script[src*="aframe"]')) {
-//     const script = document.createElement('script');
-//     script.src = 'https://aframe.io/releases/1.4.2/aframe.min.js';
-//     script.async = true;
-//     document.head.appendChild(script);
-//   }
-// }, []);
+  useEffect(() => {
+  if (typeof window !== 'undefined' && !document.querySelector('script[src*="aframe"]')) {
+    const script = document.createElement('script');
+    script.src = 'https://aframe.io/releases/1.4.2/aframe.min.js';
+    script.async = true;
+    document.head.appendChild(script);
+  }
+}, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.AFRAME &&
