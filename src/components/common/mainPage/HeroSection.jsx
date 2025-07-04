@@ -22,7 +22,7 @@ export default function HeroVideoSection() {
   return (
     <section className="relative">
       {/* 🎥 Video Background */}
-      <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] overflow-hidden">
+      <div className="w-full h-screen overflow-hidden">
         <video
           autoPlay
           loop

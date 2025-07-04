@@ -265,61 +265,72 @@ export default function Page() {
     setModels(newModels);
   };
 
-  const handleMoveItem = async (id, direction) => {
-    try {
-      const modelEl = document.getElementById(id);
-      if (!modelEl || typeof modelEl.getObject3D !== "function") {
-        console.error(`Model with id ${id} not found or does not support getObject3D.`);
-        return;
-      }
-      const internalRoomBounds = await getRoomDimensions();
-      if (!internalRoomBounds) return;
-      if (!modelEl.dataset.initialY) {
-        modelEl.dataset.initialY = modelEl.object3D.position.y;
-      }
-      const newModels = models.map((model) => {
-        if (model.id === id) {
-          const currentPosition = model.position.split(" ").map(Number);
-          let newPosition = { x: currentPosition[0], y: currentPosition[1], z: currentPosition[2] };
-          switch (direction) {
-            case "forward":
-              newPosition.z -= 0.5;
-              break;
-            case "backward":
-              newPosition.z += 0.5;
-              break;
-            case "left":
-              newPosition.x -= 0.5;
-              break;
-            case "right":
-              newPosition.x += 0.5;
-              break;
-            default:
-              break;
-          }
-          const mesh = modelEl.getObject3D("mesh");
-          if (!mesh) return model;
-          const box = new THREE.Box3().setFromObject(mesh);
-          const halfWidth = (box.max.x - box.min.x) / 2;
-          const halfDepth = (box.max.z - box.min.z) / 2;
-          newPosition.x = Math.min(
-            Math.max(newPosition.x, internalRoomBounds.minX + halfWidth),
-            internalRoomBounds.maxX - halfWidth
-          );
-          newPosition.z = Math.min(
-            Math.max(newPosition.z, internalRoomBounds.minZ + wallThickness + halfDepth),
-            internalRoomBounds.maxZ - halfDepth
-          );
-          newPosition.y = parseFloat(modelEl.dataset.initialY);
-          return { ...model, position: `${newPosition.x} ${newPosition.y} ${newPosition.z}` };
-        }
-        return model;
-      });
-      setModels(newModels);
-    } catch (error) {
-      console.error("Error moving item:", error);
+const handleMoveItem = async (id, direction) => {
+  try {
+    const modelEl = document.getElementById(id);
+    if (!modelEl || typeof modelEl.getObject3D !== "function") {
+      console.error(`Model with id ${id} not found or does not support getObject3D.`);
+      return;
     }
-  };
+    if (!modelSrc) {
+      console.error("Room model source not set.");
+      return;
+    }
+
+    // استدعي getRoomDimensions مع مصدر النموذج
+    const internalRoomBounds = await getRoomDimensions(modelSrc);
+    if (!internalRoomBounds) return;
+
+    if (!modelEl.dataset.initialY) {
+      modelEl.dataset.initialY = modelEl.object3D.position.y;
+    }
+
+    const wallThickness = 0.5; // تعريف ثابت هنا أو استورده من مكان مركزي
+
+    const newModels = models.map((model) => {
+      if (model.id === id) {
+        const currentPosition = model.position.split(" ").map(Number);
+        let newPosition = { x: currentPosition[0], y: currentPosition[1], z: currentPosition[2] };
+        switch (direction) {
+          case "forward":
+            newPosition.z -= 0.5;
+            break;
+          case "backward":
+            newPosition.z += 0.5;
+            break;
+          case "left":
+            newPosition.x -= 0.5;
+            break;
+          case "right":
+            newPosition.x += 0.5;
+            break;
+          default:
+            break;
+        }
+        const mesh = modelEl.getObject3D("mesh");
+        if (!mesh) return model;
+        const box = new THREE.Box3().setFromObject(mesh);
+        const halfWidth = (box.max.x - box.min.x) / 2;
+        const halfDepth = (box.max.z - box.min.z) / 2;
+        newPosition.x = Math.min(
+          Math.max(newPosition.x, internalRoomBounds.minX + halfWidth),
+          internalRoomBounds.maxX - halfWidth
+        );
+        newPosition.z = Math.min(
+          Math.max(newPosition.z, internalRoomBounds.minZ + wallThickness + halfDepth),
+          internalRoomBounds.maxZ - halfDepth
+        );
+        newPosition.y = parseFloat(modelEl.dataset.initialY);
+        return { ...model, position: `${newPosition.x} ${newPosition.y} ${newPosition.z}` };
+      }
+      return model;
+    });
+    setModels(newModels);
+  } catch (error) {
+    console.error("Error moving item:", error);
+  }
+};
+
   const handleScaleItem = (id, direction) => {
     const newModels = models.map((model) => {
       if (model.id === id) {
@@ -753,252 +764,132 @@ export default function Page() {
       }
     });
   }, [models]);
-  // const handleSaveScreenshot = () => {
-  //   const sceneEl = document.querySelector("a-scene");
-  //   const canvas = sceneEl?.renderer?.domElement;
+const handleDesktopScreenshot = () => {
+  const sceneEl = document.querySelector("a-scene");
+  const canvas = sceneEl?.renderer?.domElement;
 
-  //   if (!sceneEl || !sceneEl.renderer || !sceneEl.camera || !canvas) {
-  //     console.error("❌ Scene or renderer not ready.");
-  //     return;
+  if (!sceneEl || !sceneEl.renderer || !sceneEl.camera || !canvas) {
+    console.error("❌ Scene or renderer not ready.");
+    toast.error("المشهد غير جاهز");
+    return;
+  }
 
+  sceneEl.renderer.render(sceneEl.object3D, sceneEl.camera);
+  const base64Image = canvas.toDataURL("image/png");
 
+  if (!base64Image?.startsWith("data:image")) {
+    console.error("Invalid image");
+    toast.error("الصورة غير صالحة");
+    return;
+  }
 
-  //   }
-  //   sceneEl.renderer.render(sceneEl.object3D, sceneEl.camera);
-  //   const base64Image = canvas.toDataURL("image/png");
+  SaveProjects(
+    {
+      image: base64Image,
+      userEmail: "lzayd927@gmail.com",
+    },
+    {
+      onSuccess: () => {
+        console.log("✅ Uploaded successfully");
+        toast.success("Uploaded successfully");
+        router.push("/projects");
+      },
+      onError: (err) => {
+        console.error("❌ Upload error:", err);
+        toast.error("Upload error");
+      },
+    }
+  );
+};
 
+// ✅ دالة الموبايل الطويلة اللي عندك (حافظنا على اسمها)
+const handleMobileScreenshot = async () => {
+  try {
+    const sceneEl = document.querySelector("a-scene");
+    if (!sceneEl) {
+      console.error("❌ No scene found.");
+      toast.error("لم يتم العثور على المشهد");
+      return;
+    }
 
+    if (!sceneEl.hasLoaded) {
+      await new Promise((resolve) => {
+        sceneEl.addEventListener("loaded", resolve, { once: true });
+      });
+    }
 
-  //   if (!base64Image?.startsWith("data:image")) {
-  //     console.error("Invalid image");
-  //     return;
-  //   }
+    let canvas = null;
+    let retryCount = 0;
+    const maxRetries = 10;
 
-  //   SaveProjects(
-  //     {
-  //       image: base64Image,
-  //       userEmail: "lzayd927@gmail.com",
-  //     },
-  //     {
-  //       onSuccess: () => {
-  //         console.log("Uploaded successfully");
-
-  //         router.push("/projects");
-
-  //       },
-  //       onError: (err) => {
-  //         console.error(" Upload error:", err);
-  //       },
-  //     }
-  //   );
-  // };
-  //   const sceneEl = document.querySelector("a-scene");
-  //   if (!sceneEl) {
-  //     console.error("❌ No scene found.");
-  //     return;
-  //   }
-
-  //   // حاول تأخذ الكانفاس بطرق مختلفة
-  //   let canvas = sceneEl.canvas || document.querySelector("canvas.a-canvas") || (sceneEl.renderer && sceneEl.renderer.domElement);
-
-  //   let retries = 0;
-  //   while ((!canvas || typeof canvas.toDataURL !== "function") && retries < 15) {
-  //     await new Promise((res) => setTimeout(res, 300));
-  //     canvas = sceneEl.canvas || document.querySelector("canvas.a-canvas") || (sceneEl.renderer && sceneEl.renderer.domElement);
-  //     retries++;
-  //   }
-
-  //     if (!canvas || typeof canvas.toDataURL !== "function") {
-  //       console.error("❌ Canvas not ready or unsupported on this device.");
-  //       toast.error("تعذر التقاط صورة للمشهد.");
-  //       return;
-  //     }
-
-  //   // تأكد إن المشهد ظاهر (اختياري)
-  //   if (sceneEl.hasLoaded === false) {
-  //     console.error("❌ Scene not fully loaded yet.");
-  //     toast.error("المشهد غير جاهز بعد.");
-  //     return;
-  //   }
-
-  //   // خذ الصورة
-  //   const base64Image = canvas.toDataURL("image/png");
-  //   if (!base64Image?.startsWith("data:image")) {
-  //     console.error("❌ Invalid image data.");
-  //     return;
-  //   }
-
-  // SaveProjects(
-  //       {
-  //         image: base64Image,
-  //         userEmail: "gehanRashed@gmail.com",
-  //       },
-  //       {
-  //         onSuccess: () => {
-  //           console.log("Uploaded successfully");
-
-  //           router.push("/projects");
-
-  //         },
-  //         onError: (err) => {
-  //           console.error(" Upload error:", err);
-  //         },
-  //       }
-  //     );
-  //   };
-  // 🔧 الدالة المحسنة لحفظ الصور - تدعم الموبايل والكمبيوتر
-  const handleSaveScreenshot = async () => {
-    try {
-      const sceneEl = document.querySelector("a-scene");
-      if (!sceneEl) {
-        console.error("❌ No scene found.");
-        toast.error("لم يتم العثور على المشهد");
-        return;
-      }
-
-      // انتظار تحميل المشهد
-      if (!sceneEl.hasLoaded) {
-        console.log("⏳ Waiting for scene to load...");
-        await new Promise((resolve) => {
-          sceneEl.addEventListener('loaded', resolve, { once: true });
-        });
-      }
-
-      // محاولة الحصول على الكانفاس بطرق مختلفة
-      let canvas = null;
-      let retryCount = 0;
-      const maxRetries = 10;
-
-      while (!canvas && retryCount < maxRetries) {
-        // طرق مختلفة للحصول على الكانفاس
-        canvas = sceneEl.canvas ||
-          sceneEl.renderer?.domElement ||
-          document.querySelector("canvas.a-canvas") ||
-          document.querySelector("canvas[data-aframe-canvas]") ||
-          document.querySelector("canvas");
-
-        if (!canvas) {
-          console.log(`🔄 Retry ${retryCount + 1}/${maxRetries} - Canvas not found`);
-          await new Promise(resolve => setTimeout(resolve, 200));
-          retryCount++;
-        }
-      }
+    while (!canvas && retryCount < maxRetries) {
+      canvas = sceneEl.canvas ||
+               sceneEl.renderer?.domElement ||
+               document.querySelector("canvas.a-canvas") ||
+               document.querySelector("canvas[data-aframe-canvas]") ||
+               document.querySelector("canvas");
 
       if (!canvas) {
-        console.error("❌ Canvas not found after retries");
-        toast.error("تعذر العثور على لوحة الرسم");
-        return;
+        await new Promise(resolve => setTimeout(resolve, 200));
+        retryCount++;
       }
-
-      // التحقق من إمكانية استخدام toDataURL
-      if (typeof canvas.toDataURL !== "function") {
-        console.error("❌ Canvas does not support toDataURL");
-        toast.error("المتصفح لا يدعم حفظ الصور");
-        return;
-      }
-
-      // للموبايل: إجبار إعادة الرسم
-      if (isMobile && sceneEl.renderer) {
-        sceneEl.renderer.render(sceneEl.object3D, sceneEl.camera);
-      }
-
-      // محاولة الحصول على الصورة
-      let base64Image;
-      try {
-        base64Image = canvas.toDataURL("image/png", 1.0);
-      } catch (error) {
-        // إذا فشل PNG، جرب JPEG
-        try {
-          base64Image = canvas.toDataURL("image/jpeg", 0.9);
-        } catch (jpegError) {
-          console.error("❌ Failed to capture image:", jpegError);
-          toast.error("فشل في التقاط الصورة");
-          return;
-        }
-      }
-
-      // التحقق من صحة البيانات
-      if (!base64Image || !base64Image.startsWith("data:image")) {
-        console.error("❌ Invalid image data");
-        toast.error("بيانات الصورة غير صالحة");
-        return;
-      }
-
-      // رفع الصورة
-      SaveProjects(
-        {
-          image: base64Image,
-          userEmail: "lzayd927@gmail.com",
-        },
-        {
-          onSuccess: () => {
-            console.log("✅ Screenshot saved successfully");
-            toast.success("تم حفظ الصورة بنجاح");
-            router.push("/projects");
-          },
-          onError: (err) => {
-            console.error("❌ Upload error:", err);
-            toast.error("فشل في رفع الصورة");
-          },
-        }
-      );
-
-    } catch (error) {
-      console.error("❌ Unexpected error:", error);
-      toast.error("حدث خطأ غير متوقع");
     }
-  };
 
-  // 🔧 إضافة دالة للتحقق من جاهزية الكانفاس
-  const checkCanvasReady = () => {
-    const sceneEl = document.querySelector("a-scene");
-    if (!sceneEl) return false;
+    if (!canvas || typeof canvas.toDataURL !== "function") {
+      toast.error("تعذر الحصول على الصورة");
+      return;
+    }
 
-    const canvas = sceneEl.canvas ||
-      sceneEl.renderer?.domElement ||
-      document.querySelector("canvas.a-canvas");
-
-    return canvas && typeof canvas.toDataURL === "function";
-  };
-
-  // 🔧 إضافة دالة لإجبار إعادة الرسم (للموبايل)
-  const forceRender = () => {
-    const sceneEl = document.querySelector("a-scene");
-    if (sceneEl && sceneEl.renderer && sceneEl.camera) {
+    if (isMobile && sceneEl.renderer) {
       sceneEl.renderer.render(sceneEl.object3D, sceneEl.camera);
     }
-  };
 
-  // 🔧 تحسين زر الحفظ
-  const SaveButton = () => {
-    const [isReady, setIsReady] = useState(false);
+    let base64Image;
+    try {
+      base64Image = canvas.toDataURL("image/png", 1.0);
+    } catch {
+      try {
+        base64Image = canvas.toDataURL("image/jpeg", 0.9);
+      } catch (jpegError) {
+        toast.error("فشل في التقاط الصورة");
+        return;
+      }
+    }
 
-    useEffect(() => {
-      const checkReady = () => {
-        setIsReady(checkCanvasReady());
-      };
+    if (!base64Image || !base64Image.startsWith("data:image")) {
+      toast.error("بيانات الصورة غير صالحة");
+      return;
+    }
 
-      // فحص دوري للتأكد من جاهزية الكانفاس
-      const interval = setInterval(checkReady, 1000);
-      checkReady(); // فحص فوري
-
-      return () => clearInterval(interval);
-    }, []);
-
-    return (
-      <button
-        onClick={handleSaveScreenshot}
-        disabled={!isReady}
-        className={`w-10 h-10 flex items-center justify-center text-lg rounded-full shadow transition-all duration-300 ${isReady
-          ? 'bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 cursor-pointer'
-          : 'bg-gray-300 text-gray-500 border border-gray-400 cursor-not-allowed'
-          }`}
-        title={isReady ? "Save Screenshot" : "Please wait..."}
-      >
-        💾
-      </button>
+    SaveProjects(
+      {
+        image: base64Image,
+        userEmail: "lzayd927@gmail.com",
+      },
+      {
+        onSuccess: () => {
+          toast.success("تم حفظ الصورة بنجاح");
+          router.push("/projects");
+        },
+        onError: (err) => {
+          toast.error("فشل في رفع الصورة");
+        },
+      }
     );
-  };
+
+  } catch (error) {
+    toast.error("حدث خطأ غير متوقع");
+  }
+};
+
+// ✅ دالة موحدة تستدعي الصح حسب الجهاز
+const handleSaveScreenshot = () => {
+  if (isMobile) {
+    handleMobileScreenshot();
+  } else {
+    handleDesktopScreenshot();
+  }
+};
 
   return (
     <ResponsiveARView
@@ -1222,7 +1113,7 @@ export default function Page() {
         <a-scene embedded physics="debug: false" className="w-full h-full rounded-lg shadow-lg">
           {/* 🟡 إضاءة ناعمة وواقعية */}
 
-          <a-entity light="type: ambient; color: #ffffff; intensity: 0.9"></a-entity>
+          <a-entity light="type: ambient; color: #ffffff; intensity: 0.5"></a-entity>
 
           <a-entity
             light="type: point; intensity: 0.4; distance: 8"
@@ -1278,8 +1169,6 @@ export default function Page() {
             scale="0.01 0.01 0.01"
           />
 
-
-
           {/* 🌫️ سقف */}
           <a-box position="0 3.2 0" width="12" depth="12" height="0.1" color="#f5f5f5"></a-box>
 
@@ -1321,11 +1210,6 @@ export default function Page() {
             </a-camera>
           </a-entity>
         </a-scene>
-
-
-
-
-
       ) : modelSrc ? (
         //  Model Room
         <a-scene embedded physics className="w-full h-full rounded-lg shadow-lg">

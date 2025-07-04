@@ -74,7 +74,7 @@ export default function Hero3DSection() {
           transition={{ duration: 1.2 }}
         >
           <model-viewer
-            src="/room2.glb"
+            src="/living_room_ii.glb"
             alt="VidAR Logo"
             camera-controls
             auto-rotate
