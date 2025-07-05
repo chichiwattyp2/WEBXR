@@ -349,7 +349,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('http://13.48.25.101:8000/api/auth/login', {
+      const res = await fetch('https://api.virtualinteriordesign.click/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
