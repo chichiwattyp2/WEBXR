@@ -52,6 +52,8 @@ export default function Page() {
   const { mutate: mutateGetArFile } = useGetArFile();
   const [floorColor, setFloorColor] = useState("#9b7c55");
   const [wallColor, setWallColor] = useState("#b13535");
+  const userEmail = localStorage.getItem('userEmail') || '';
+
   useEffect(() => {
     if (typeof window !== 'undefined' && !document.querySelector('script[src*="aframe"]')) {
       const script = document.createElement('script');
@@ -63,6 +65,8 @@ export default function Page() {
   useEffect(() => {
     const savedFloor = localStorage.getItem("floorColor");
     const savedWall = localStorage.getItem("wallColor");
+   
+
     if (savedFloor) setFloorColor(savedFloor);
     if (savedWall) setWallColor(savedWall);
   }, []);
@@ -749,7 +753,7 @@ const handleMoveItem = async (id, direction) => {
     let adjustedMinY = initialMinY * scaleFactor;
     modelEl.object3D.position.y += floorY + groundHeight - adjustedMinY;
   };
-const userEmail = localStorage.getItem('userEmail') || '';
+
   useEffect(() => {
     models.forEach((model) => {
       const modelEl = document.getElementById(model.id);
@@ -1217,8 +1221,8 @@ const handleSaveScreenshot = () => {
           <a-entity gltf-model={modelSrc} position="0 0 0" scale="1 1 1" static-body />
 
           {/* الإضاءة */}
-          <a-entity light="type: ambient; color: #fff; intensity: 0.6"></a-entity>
-          <a-entity light="type: directional; color: #fff; intensity: 0.5" position="1 3 1"></a-entity>
+          <a-entity light="type: ambient; color: #fff; intensity: 0.9"></a-entity>
+          <a-entity light="type: directional; color: #fff; intensity: 0.6" position="1 3 1"></a-entity>
 
           {/* الأرضية الشفافة للتفاعل */}
           <a-plane

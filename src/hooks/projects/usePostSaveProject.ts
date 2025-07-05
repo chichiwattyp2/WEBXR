@@ -1,3 +1,4 @@
+"use client";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -20,11 +21,6 @@ const uploadProjectImage = async (base64Image: string, email: string) => {
   formData.append("image", file);
   formData.append("userEmail", email);
 
-  // ✅ Debug: طباعة محتوى الفورم داتا
-  for (const [key, value] of formData.entries()) {
-    console.log(`📦 ${key}:`, value);
-  }
-
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BASE_URL}/projects/upload-project`,
     formData,
@@ -44,3 +40,4 @@ const usePostSaveProjects = () => {
 };
 
 export default usePostSaveProjects;
+

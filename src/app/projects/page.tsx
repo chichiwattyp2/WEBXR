@@ -196,12 +196,14 @@ export default function Projects() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction 
-                        className="bg-red-500 hover:bg-red-700"
+                        <AlertDialogAction
+                          className="bg-red-500 hover:bg-red-700"
                           onClick={() => {
-                            if (confirmDeleteId) deleteProject(confirmDeleteId);
+                            const userEmail = localStorage.getItem("userEmail") || "";
+                            if (confirmDeleteId) deleteProject({ projectId: confirmDeleteId, userEmail });
                             setConfirmDeleteId(null);
                           }}
+
                         >
                           Delete
                         </AlertDialogAction>

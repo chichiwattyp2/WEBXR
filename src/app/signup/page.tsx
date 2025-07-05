@@ -5397,12 +5397,13 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  // const [showConfetti, setShowConfetti] = useState(false);
-  // const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const updateSize = () => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+      console.log(showConfetti , windowSize)
     };
     updateSize();
     window.addEventListener('resize', updateSize);

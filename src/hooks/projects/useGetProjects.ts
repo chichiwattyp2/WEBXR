@@ -1,13 +1,15 @@
-"use client"
+"use client";
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
-import {  IProjects } from '@/types/types';
-const userEmail = localStorage.getItem('userEmail') || '';
+import { IProjects } from '@/types/types';
+
+
 const fetchProjects = async (): Promise<IProjects[]> => {
+  const userEmail = localStorage.getItem('userEmail') || '';
   const response = await axios.post(
     `${process.env.NEXT_PUBLIC_BASE_URL}/projects/projects`,
     {
-      userEmail, 
+      userEmail,
     }
   );
 
