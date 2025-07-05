@@ -54,11 +54,6 @@ export default function StartButton() {
         whileTap={{ scale: 0.95 }}
         className="group relative flex items-center gap-3 bg-white text-[#0d4c3e] px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-all duration-300 hover:pl-10 shadow-md hover:shadow-xl"
       >
-        <Link href="/uploadIMG" className="transition-all duration-300 uppercase">
-          Start Now !
-        </Link>
-
-        {/* نبض مستمر للسهم */}
         <motion.span
           className="text-xl"
           animate={{
@@ -72,6 +67,12 @@ export default function StartButton() {
         >
           ➜
         </motion.span>
+        <Link href="/uploadIMG" className="transition-all duration-300 uppercase">
+          Start Now !
+        </Link>
+
+        {/* نبض مستمر للسهم */}
+
       </motion.button>
 
       <motion.button
@@ -82,9 +83,7 @@ export default function StartButton() {
         whileTap={{ scale: 0.95 }}
         className="group relative flex items-center gap-3 bg-white text-[#0d4c3e] px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-all duration-300 hover:pl-10 shadow-md hover:shadow-xl"
       >
-        <Link href="/howtouse" className="transition-all duration-300 uppercase">
-          How to Use
-        </Link>
+
 
         {/* نبض مستمر للسهم */}
         <motion.span
@@ -100,6 +99,9 @@ export default function StartButton() {
         >
           ➜
         </motion.span>
+        <Link href="/howtouse" className="transition-all duration-300 uppercase">
+          How to Use
+        </Link>
       </motion.button>
     </div>
   );

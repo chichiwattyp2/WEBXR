@@ -655,7 +655,6 @@ export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-
   useEffect(() => {
     const checkToken = () => {
       const token = localStorage.getItem("token");
@@ -667,6 +666,7 @@ export default function Navbar() {
     window.addEventListener("storage", checkToken);
     return () => window.removeEventListener("storage", checkToken);
   }, []);
+
 
   const isActive = (path: string) => pathname === path;
 
@@ -693,21 +693,22 @@ export default function Navbar() {
         <div className="text-white text-xl font-bold">
           <Link href="/">
             <div className="hover:cursor-pointer">
-              <Image 
-                src="/logo.jpg" 
-                alt="ARvana Logo" 
-                width={50} 
-                height={20} 
+              <Image
+                src="/logo.jpg"
+                alt="ARvana Logo"
+                width={50}
+                height={20}
                 priority
               />
             </div>
           </Link>
+
         </div>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
           {navItems.map(({ href, label }) => {
-            const redirectPath = 
+            const redirectPath =
               !isLoggedIn && (href === "/projects" || href === "/uploadIMG")
                 ? "/login"
                 : href;
@@ -715,11 +716,10 @@ export default function Navbar() {
             return (
               <Link key={href} href={redirectPath}>
                 <span
-                  className={`cursor-pointer transition-all ${
-                    isActive(href)
-                      ? "text-white font-semibold border-b-2 py-1 border-white"
-                      : "text-white hover:text-white"
-                  }`}
+                  className={`cursor-pointer transition-all ${isActive(href)
+                    ? "text-white font-semibold border-b-2 py-1 border-white"
+                    : "text-white hover:text-white"
+                    }`}
                 >
                   {label}
                 </span>
@@ -733,7 +733,7 @@ export default function Navbar() {
               transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
             >
               <Link href="/login">
-                <CiLogout
+                <CiLogin
                   className="text-white text-2xl cursor-pointer hover:text-gray-300"
                   title="Login"
                 />
@@ -751,23 +751,46 @@ export default function Navbar() {
         </div>
 
         {/* Hamburger Icon (Mobile) */}
-        <div className="md:hidden">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="flex flex-col justify-between w-6 h-5 focus:outline-none"
-          >
-            <span className={`block h-0.5 bg-white transition-transform duration-300 ${isOpen ? "transform rotate-45 translate-y-1.5" : ""}`}></span>
-            <span className={`block h-0.5 bg-white transition-opacity duration-300 ${isOpen ? "opacity-0" : ""}`}></span>
-            <span className={`block h-0.5 bg-white transition-transform duration-300 ${isOpen ? "transform -rotate-45 -translate-y-1.5" : ""}`}></span>
-          </button>
+        <div className="md:hidden flex items-center justify-between">
+          {/* Hamburger Icon */}
+          <div className="flex items-center">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="flex flex-col justify-between w-6 h-5 focus:outline-none"
+            >
+              <span className={`block h-0.5 bg-white transition-transform duration-300 ${isOpen ? "transform rotate-45 translate-y-1.5" : ""}`}></span>
+              <span className={`block h-0.5 bg-white transition-opacity duration-300 ${isOpen ? "opacity-0" : ""}`}></span>
+              <span className={`block h-0.5 bg-white transition-transform duration-300 ${isOpen ? "transform -rotate-45 -translate-y-1.5" : ""}`}></span>
+            </button>
+          </div>
+
+          {/* Login / Logout Icons */}
+          <div className="flex items-center ml-6 space-x-4">
+            {!isLoggedIn && (
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+              >
+                <Link href="/login">
+                  <CiLogin className="text-white text-2xl cursor-pointer " title="Login" />
+                </Link>
+              </motion.div>
+            )}
+            {isLoggedIn && (
+              <CiLogout
+                onClick={handleLogout}
+                className="text-white text-2xl cursor-pointer hover:text-mainbackground"
+                title="Logout"
+              />
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden mt-4 bg-[#0d4c3e] px-4 py-4 space-y-3 rounded-b-lg shadow-lg transition-all duration-300">
           {navItems.map(({ href, label }) => {
-            const redirectPath = 
+            const redirectPath =
               !isLoggedIn && (href === "/projects" || href === "/uploadIMG")
                 ? "/login"
                 : href;
@@ -775,40 +798,20 @@ export default function Navbar() {
             return (
               <Link key={href} href={redirectPath}>
                 <span
-                  className={`block text-white text-base px-3 py-2 rounded-md transition-all duration-200 ${
-                    isActive(href)
-                      ? "bg-white text-[#0d4c3e] font-semibold"
-                      : "hover:bg-white hover:text-[#0d4c3e]"
-                  }`}
+                  className={`block text-white text-base px-3 py-2 rounded-md transition-all duration-200 
+                      
+                    }`}
                 >
                   {label}
                 </span>
               </Link>
             );
           })}
-
-          <div className="flex justify-center space-x-4 pt-2">
-            {!isLoggedIn && (
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-              >
-                <Link href="/login">
-                  <CiLogin className="text-white text-2xl cursor-pointer hover:text-gray-300" title="Login" />
-                </Link>
-              </motion.div>
-            )}
-
-            {isLoggedIn && (
-              <CiLogout
-                onClick={handleLogout}
-                className="text-white text-2xl cursor-pointer hover:text-gray-300"
-                title="Logout"
-              />
-            )}
-          </div>
         </div>
       )}
+       
+        
+      
     </nav>
   );
 }

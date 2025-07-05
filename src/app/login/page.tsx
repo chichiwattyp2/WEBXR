@@ -362,6 +362,7 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || 'Login failed');
 
       localStorage.setItem('token', data.token || '');
+      localStorage.setItem('userEmail', formData.email);
       window.dispatchEvent(new Event('storage'));
 
       setSuccess('Login successful! Redirecting...');
@@ -369,7 +370,7 @@ export default function LoginPage() {
 
       setTimeout(() => {
         router.push('/');
-        location.reload();
+        // location.reload();
       }, 500);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Something went wrong.';
@@ -402,76 +403,137 @@ export default function LoginPage() {
     initial={{ opacity: 0, y: 40 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 1, ease: 'easeOut' }}
-    className="relative z-10 w-full max-w-lg p-10 rounded-[30px] bg-black/50 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.15)]"
+    className="relative z-10 w-full max-w-lg p-10 rounded-[30px] bg-[#0d4c3e]/30 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.15)]"
   >
-    <div className="px-6 sm:px-10 py-10 sm:py-14 flex flex-col justify-center">
+  <div className="px-6 sm:px-10 py-10 sm:py-14 flex flex-col justify-center">
+<motion.h2
+  initial={{ opacity: 0, y: -30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8, ease: 'easeOut' }}
+  className="text-3xl font-bold text-white mb-2"
+>
+  Welcome back to{' '}
+  <span className="italic text-[#00ffb3] font-extrabold tracking-wide">Vider</span>
+</motion.h2>
 
-      <h2 className="text-3xl font-bold text-white mb-2">Welcome back to Vider</h2>
-      <p className="text-sm text-gray-300 mb-6">Design your dream room with AR magic.</p>
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-            Email address
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="mt-1 w-full bg-transparent border-b border-gray-400 text-white placeholder-gray-300 focus:outline-none focus:border-white transition duration-300"
-            required
-          />
-        </div>
 
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-300">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            className="mt-1 w-full bg-transparent border-b border-gray-400 text-white placeholder-gray-300 focus:outline-none focus:border-white transition duration-300"
-            required
-          />
-        </div>
+  <motion.p
+    initial={{ opacity: 0, y: -10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
+    className="text-sm text-gray-300 mb-6"
+  >
+    Design your dream room with AR magic.
+  </motion.p>
 
-        <div className="flex items-center justify-between text-sm text-gray-300">
-          <label className="flex items-center">
-            <input type="checkbox" className="mr-2" />
-            Remember for 30 days
-          </label>
-          <Link href="/forgot-password" className="text-green-500 font-bold hover:underline">
-            Forgot password
-          </Link>
-        </div>
+  <form className="space-y-5" onSubmit={handleSubmit}>
+    {/* Email Input */}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.3 }}
+    >
+      <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+        Email address :
+      </label>
+      <input
+        id="email"
+        type="email"
+        value={formData.email}
+        onChange={handleChange}
+        placeholder="Enter your email"
+        className="w-full px-4 py-3 bg-transparent border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d4c3e] transition duration-300"
+        required
+      />
+    </motion.div>
 
-        {error && <p className="text-red-500 font-bold text-sm mt-2 text-center">{error}</p>}
-        {success && <p className="text-green-700 font-bold text-sm mt-2 text-center">{success}</p>}
+    {/* Password Input */}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.4 }}
+    >
+      <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+        Password :
+      </label>
+      <input
+        id="password"
+        type="password"
+        value={formData.password}
+        onChange={handleChange}
+        placeholder="Enter your password"
+        className="w-full px-4 py-3 bg-transparent border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0d4c3e] transition duration-300"
+        required
+      />
+    </motion.div>
 
-        <motion.button
-          whileHover={{ scale: 1.03 }}
-          transition={{ duration: 0.4 }}
-          type="submit"
-          disabled={loading}
-          className={`w-full py-3 rounded-xl font-semibold transition-all duration-500 ${
-            loading
-              ? 'bg-gray-400 cursor-not-allowed text-white'
-              : 'bg-[#0d4c3e] text-white hover:bg-[#093b30] shadow-[0_0_12px_#0d4c3e80] hover:shadow-[0_0_20px_#0d4c3eff]'
-          }`}
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </motion.button>
-      </form>
-      <p className="mt-6 text-sm text-center text-gray-300">
-        Don’t have an account?{' '}
-        <Link href="/signup" className="text-green-500 font-bold hover:underline">
-          Sign up
-        </Link>
-      </p>
-    </div>
+    {/* Remember & Forgot */}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.5 }}
+      className="flex items-center justify-between text-sm text-gray-300"
+    >
+      <label className="flex items-center">
+        <input type="checkbox" className="mr-2" />
+        Remember for 30 days
+      </label>
+      <Link href="/forgot-password" className="text-green-500 font-bold hover:underline">
+        Forgot password
+      </Link>
+    </motion.div>
+
+    {/* Error / Success Messages */}
+    {error && (
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-red-500 font-bold text-sm text-center"
+      >
+        {error}
+      </motion.p>
+    )}
+    {success && (
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-green-600 font-bold text-sm text-center"
+      >
+        {success}
+      </motion.p>
+    )}
+
+    {/* Submit Button */}
+    <motion.button
+      whileHover={{ scale: loading ? 1 : 1.03 }}
+      transition={{ duration: 0.4 }}
+      type="submit"
+      disabled={loading}
+      className={`w-full py-3 rounded-xl font-semibold transition-all duration-500 ${
+        loading
+          ? 'bg-gray-400 cursor-not-allowed text-white'
+          : 'bg-[#0d4c3e] text-white hover:bg-[#093b30] shadow-[0_0_12px_#0d4c3e80] hover:shadow-[0_0_20px_#0d4c3eff]'
+      }`}
+    >
+      {loading ? 'Logging in...' : 'Login'}
+    </motion.button>
+  </form>
+
+  {/* Signup Prompt */}
+  <motion.p
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ delay: 0.6, duration: 0.6 }}
+    className="mt-6 text-sm text-center text-gray-300"
+  >
+    Don’t have an account?{' '}
+    <Link href="/signup" className="text-green-500 font-bold hover:underline">
+      Sign up
+    </Link>
+  </motion.p>
+</div>
+
   </motion.div>
 </div>
 

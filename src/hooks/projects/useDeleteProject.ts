@@ -1,29 +1,38 @@
+"use client"
 import axios from 'axios';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from "react-hot-toast";
+import { useRouter } from 'next/navigation';
 
-const deleteProject = async (projectId: string) => {
-  const response = await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/projects/delete-project/${projectId}`, {
-    data: {
-      userEmail: "lzayd927@gmail.com"
+
+const deleteProject = async (projectId: string, userEmail: string) => {
+  const response = await axios.delete(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/projects/delete-project/${projectId}`,
+    {
+      data: { userEmail },
     }
-  });
+  );
   return response.data;
 };
 
 const useDeleteProject = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation({
-    mutationFn: deleteProject,
+    mutationFn: async (projectId: string) => {
+      const userEmail = localStorage.getItem('userEmail') || '';
+      return deleteProject(projectId, userEmail);
+    },
     onSuccess: () => {
-      toast.success(" Project deleted successfully");
+      toast.success("Project deleted successfully");
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+     router.refresh();
     },
     onError: (error) => {
-      toast.error(" Failed to delete project");
+      toast.error("Failed to delete project");
       console.error(error);
-    }
+    },
   });
 };
 

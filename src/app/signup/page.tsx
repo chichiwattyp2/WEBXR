@@ -5380,7 +5380,7 @@ import { useEffect, useState} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Confetti from 'react-confetti';
+
 import { motion } from 'framer-motion';
 import React from 'react'; // Required for typing
 
@@ -5479,7 +5479,7 @@ return (
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 1, ease: 'easeOut' }}
-      className="relative z-10 w-full max-w-lg rounded-[30px] bg-black/60 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.4)] px-6 sm:px-10 py-10 sm:py-14 flex flex-col justify-center"
+      className="relative z-10 w-full max-w-lg rounded-[30px] bg-[#0d4c3e]/30 backdrop-blur-md shadow-[0_0_30px_rgba(0,0,0,0.4)] px-6 sm:px-10 py-10 sm:py-14 flex flex-col justify-center"
     >
       <h2 className="text-4xl font-extrabold text-white mb-2 text-center">Get Started</h2>
       <p className="text-sm text-gray-300 mb-8 text-center">Your Virtual Design Journey Starts Here</p>

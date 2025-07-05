@@ -749,7 +749,7 @@ const handleMoveItem = async (id, direction) => {
     let adjustedMinY = initialMinY * scaleFactor;
     modelEl.object3D.position.y += floorY + groundHeight - adjustedMinY;
   };
-
+const userEmail = localStorage.getItem('userEmail') || '';
   useEffect(() => {
     models.forEach((model) => {
       const modelEl = document.getElementById(model.id);
@@ -769,8 +769,8 @@ const handleDesktopScreenshot = () => {
   const canvas = sceneEl?.renderer?.domElement;
 
   if (!sceneEl || !sceneEl.renderer || !sceneEl.camera || !canvas) {
-    console.error("❌ Scene or renderer not ready.");
-    toast.error("المشهد غير جاهز");
+  
+    toast.error(" Scene or renderer not ready.");
     return;
   }
 
@@ -779,30 +779,30 @@ const handleDesktopScreenshot = () => {
 
   if (!base64Image?.startsWith("data:image")) {
     console.error("Invalid image");
-    toast.error("الصورة غير صالحة");
+    toast.error("Invalid image");
     return;
   }
 
   SaveProjects(
     {
       image: base64Image,
-      userEmail: "lzayd927@gmail.com",
+      userEmail,
     },
     {
       onSuccess: () => {
-        console.log("✅ Uploaded successfully");
+        console.log(" Uploaded successfully");
         toast.success("Uploaded successfully");
         router.push("/projects");
       },
       onError: (err) => {
-        console.error("❌ Upload error:", err);
+        console.error(" Upload error:", err);
         toast.error("Upload error");
       },
     }
   );
 };
 
-// ✅ دالة الموبايل الطويلة اللي عندك (حافظنا على اسمها)
+//  دالة الموبايل الطويلة اللي عندك (حافظنا على اسمها)
 const handleMobileScreenshot = async () => {
   try {
     const sceneEl = document.querySelector("a-scene");
@@ -864,15 +864,16 @@ const handleMobileScreenshot = async () => {
     SaveProjects(
       {
         image: base64Image,
-        userEmail: "lzayd927@gmail.com",
+        userEmail,
       },
       {
         onSuccess: () => {
-          toast.success("تم حفظ الصورة بنجاح");
+         
+        toast.success("Uploaded successfully");
           router.push("/projects");
         },
-        onError: (err) => {
-          toast.error("فشل في رفع الصورة");
+        onError: () => {
+          toast.error("Upload error");
         },
       }
     );
@@ -1216,7 +1217,7 @@ const handleSaveScreenshot = () => {
           <a-entity gltf-model={modelSrc} position="0 0 0" scale="1 1 1" static-body />
 
           {/* الإضاءة */}
-          <a-entity light="type: ambient; color: #fff; intensity: 1"></a-entity>
+          <a-entity light="type: ambient; color: #fff; intensity: 0.6"></a-entity>
           <a-entity light="type: directional; color: #fff; intensity: 0.5" position="1 3 1"></a-entity>
 
           {/* الأرضية الشفافة للتفاعل */}
