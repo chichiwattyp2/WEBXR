@@ -64,7 +64,7 @@ return (
             itemTwo={
             <div style={{ position: "relative", height: "100%" }}>
                 <LabelOverlay text="After" position="right" />
-                <ReactCompareSliderImage src="/After.jpg" alt="After" />
+                <ReactCompareSliderImage src="/after.jpg" alt="After" />
             </div>
             }
             style={{

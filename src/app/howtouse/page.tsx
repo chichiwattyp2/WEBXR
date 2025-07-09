@@ -302,34 +302,32 @@
 
 import { useEffect, useState } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
-import Tilt from 'react-parallax-tilt';
 import Particles from 'react-tsparticles';
 
 const steps = [
   {
-    title: '1. Upload Furniture',
-    description: 'Choose your favorite 3D furniture models or upload your own. You can drag and drop or select from our gallery.',
-    image: '/1.png',
+    title: '1. Sign In',
+    description: 'Start by signing in to access the full features of the virtual interior designer.',
   },
   {
-    title: '2. Place in Your Space',
-    description: 'Click to place your furniture in your virtual room. Move it around freely within the boundaries.',
-    image: '/2.png',
+    title: '2. Choose a Room',
+    description: 'Go to the design page and choose either a 3D room template or a Custom Room layout.',
   },
   {
-    title: '3. Adjust, Rotate & Scale',
-    description: 'Use the control menu to rotate, scale, or fine-tune the position of your item.',
-    image: '/4.png',
+    title: '3. Enter AR Mode',
+    description: 'After selecting a room, you will be redirected to the AR page automatically.',
   },
   {
-    title: '4. Preview in AR',
-    description: 'Switch to AR mode to view your room with the furniture in real-time through your camera.',
-    image: '/',
+    title: '4. Add Furniture',
+    description: 'You can either choose furniture from our database, upload your own 3D model, or convert a 2D image to 3D using mesh.ai.',
   },
   {
-    title: '5. Save Your Design',
-    description: 'Take a screenshot of your design to save and share your virtual layout.',
-    image: '/p.png',
+    title: '5. Control & Move Items',
+    description: 'Use drag-and-drop or the control menu to rotate, scale, duplicate, or measure between two points in the room.',
+  },
+  {
+    title: '6. Preview in Real World (QR Code)',
+    description: 'Generate a QR code for your room. If scanned from a mobile device, the furniture appears in real-world AR. From a laptop, a scan view will be shown.',
   },
 ];
 
@@ -342,7 +340,6 @@ const HowToUsePage = () => {
 
   return (
     <main className="bg-[#0d4c3e] text-white font-sans min-h-screen py-24 px-4 sm:px-8 overflow-hidden relative">
-      {/* Particles Background */}
       <Particles
         className="absolute inset-0 z-0"
         options={{
@@ -358,7 +355,6 @@ const HowToUsePage = () => {
         }}
       />
 
-      {/* Scroll progress bar */}
       {mounted && (
         <motion.div
           style={{ scaleX }}
@@ -368,13 +364,13 @@ const HowToUsePage = () => {
 
       <div className="max-w-6xl mx-auto relative z-10">
         <motion.h1
-          className="text-4xl sm:text-5xl font-extrabold text-center mb-24 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-teal-200 to-lime-300 drop-shadow-md"
-          initial={{ opacity: 0, scale: 0.95 }}
+          className="text-4xl sm:text-5xl font-extrabold text-center mb-24 tracking-tight bg-clip-text  drop-shadow-md"
+          initial={{ opacity: 0.5, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: 'easeOut' }}
         >
           <motion.span
-            initial={{ opacity: 0 }}
+            initial={{ opacity: 0.5 }}
             animate={{ opacity: [0, 1, 0.8, 1] }}
             transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
           >
@@ -382,74 +378,57 @@ const HowToUsePage = () => {
           </motion.span>
         </motion.h1>
 
-        <div className="space-y-36">
+        <div className="relative border-l-4 border-lime-300 pl-8 space-y-20">
           {steps.map((step, i) => (
             <motion.div
               key={i}
-              className={`relative group flex flex-col md:flex-row items-center gap-12 ${
-                i % 2 !== 0 ? 'md:flex-row-reverse' : ''
-              }`}
-              initial={{ opacity: 0, y: 80, rotateX: -10 }}
-              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-              transition={{ duration: 1, delay: i * 0.2 }}
+              className="relative"
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: i * 0.2 }}
               viewport={{ once: true }}
             >
-              {/* Step Badge */}
-              <motion.div
-                className="absolute -top-10 left-1/2 transform -translate-x-1/2 z-20"
-                initial={{ opacity: 0, y: -10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.2 + 0.3 }}
-              >
-                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2 shadow-lg text-sm text-white font-semibold tracking-wide animate-pulse">
-                  Step {i + 1}
-                </div>
-              </motion.div>
-
-              {/* Image with Tilt */}
-              <Tilt
-                tiltMaxAngleX={5}
-                tiltMaxAngleY={5}
-                glareEnable={true}
-                glareMaxOpacity={0.2}
-                className="w-full md:w-1/2 rounded-2xl"
-              >
-                <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-[#9be7c4]/30 to-[#48cfae]/20 blur-2xl z-0 opacity-20 group-hover:scale-110 transition-transform duration-500" />
-                  <motion.img
-                    src={step.image}
-                    alt={step.title}
-                    className="relative z-10 w-full h-auto object-cover rounded-2xl transition-transform duration-500 group-hover:scale-[1.03] group-hover:rotate-[0.5deg]"
-                    whileHover={{ scale: 1.03 }}
-                  />
-                </div>
-              </Tilt>
-
-              {/* Text Block */}
-              <motion.div
-                className="md:w-1/2 bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-2xl border border-white/10 shadow-lg"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.2 + 0.1 }}
-              >
-                <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-lime-200 drop-shadow-md">
+              <div className="absolute -left-[2.2rem] top-1.5 w-4 h-4 bg-lime-300 rounded-full border-2 border-white shadow-lg" />
+              <div className="bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-xl border border-white/10 shadow-lg">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-lime-200">
                   {step.title}
                 </h2>
-                <p className="text-white/80 text-sm sm:text-base leading-relaxed tracking-wide">
+                <p className="text-white/80 text-sm sm:text-base leading-relaxed">
                   {step.description}
                 </p>
-              </motion.div>
+              </div>
             </motion.div>
           ))}
 
-          {/* Fancy Divider at bottom */}
+          {/* QR Code Visual at the End */}
           <motion.div
-            className="w-full h-16 mt-20 relative"
-            initial={{ width: 0 }}
-            whileInView={{ width: '100%' }}
-            transition={{ duration: 1.5, ease: 'easeInOut' }}
+            className="flex flex-col md:flex-row items-center justify-center gap-8 mt-20"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
           >
-            <div className="absolute inset-0 h-1 bg-gradient-to-r from-transparent via-lime-300 to-transparent blur-sm animate-pulse rounded-full" />
+            <div className="bg-white p-6 rounded-2xl shadow-2xl">
+              <img
+                src="/qr-code-mobile.png"
+                alt="Mobile View"
+                className="w-60 h-60 object-cover object-bottom rounded-xl"
+              />
+              <p className="text-center mt-3 text-base text-black font-semibold">
+                View in Real World
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-2xl">
+              <img
+                src="/qr-code-laptop.png"
+                alt="Laptop Scan"
+                className="w-60 h-60 object-cover  rounded-xl"
+              />
+              <p className="text-center mt-3 text-base text-black font-semibold">
+                Scan to Open on Mobile
+              </p>
+            </div>
+
           </motion.div>
         </div>
       </div>

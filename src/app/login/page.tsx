@@ -413,7 +413,7 @@ export default function LoginPage() {
   className="text-3xl font-bold text-white mb-2"
 >
   Welcome back to{' '}
-  <span className="italic text-[#00ffb3] font-extrabold tracking-wide">Vider</span>
+  <span className="italic text-[#00ffb3] font-extrabold tracking-wide">VidAR</span>
 </motion.h2>
 
 
