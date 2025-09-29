@@ -1,14 +1,24 @@
-// pages/publish-confirm/publish-confirm.js
+import { useEffect } from 'react';
 
-let response = await fetch(`https://gatekeeper-arjsstudio.fly.dev/authenticate/${queryDict.code}`);
-response = await response.json();
+export default function PublishConfirm() {
+  useEffect(() => {
+    async function publish() {
+      let response = await fetch(`https://gatekeeper-arjsstudio.fly.dev/authenticate/${queryDict.code}`);
+      response = await response.json();
 
-const pkg = new Package(window.session);
+      const pkg = new Package(window.session);
 
-const pagesUrl = await pkg.serve({
-    packageType: 'github',
-    token: response.token, // required, must be an OAuth2 token
-    message: 'first commit for WebAR!' // optional
-});
+      const pagesUrl = await pkg.serve({
+        packageType: 'github',
+        token: response.token,
+        message: 'first commit for WebAR!',
+      });
 
-console.log("Published to:", pagesUrl);
+      console.log("Published to:", pagesUrl);
+    }
+
+    publish();
+  }, []);
+
+  return <div>Publishing, please wait...</div>;
+}
